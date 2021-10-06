@@ -10,8 +10,10 @@
 
 ``` pyhton
 pip install websockets 
+```
 websocket库
 
-pip install Crypto
-加密库 用于AES加、解密
 ```
+pip install Crypto
+```
+加密库 用于AES加、解密
