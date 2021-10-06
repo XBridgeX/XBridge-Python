@@ -4,6 +4,7 @@ import websockets
 import Utils.AES as AES
 import Utils.MD5 as MD5
 import json
+import Utils.PackHelper as PHelper
 
 password = "password"
 
@@ -20,6 +21,7 @@ async def send_msg(websocket):
         print(f"{recv_text}")
         rece = json.loads(f"{recv_text}")["params"]["raw"]
         print(AES.AES_Decrypt(k,vi,rece))
+        await websocket.send(PHelper.GetRuncmdPack('list','114514')) #执行list命令
 
 # 客户端主逻辑
 async def main_XBridge():
