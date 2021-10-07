@@ -18,6 +18,8 @@ pip install pycryptodome
 ```
 加密库 用于AES加、解密
 
-```pip install nonebot```
+```
+pip install nonebot
+```
 
 nonebot模块
