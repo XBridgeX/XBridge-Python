@@ -14,6 +14,10 @@ pip install websockets
 websocket库
 
 ```
-pip install Crypto
+pip install pycryptodome
 ```
 加密库 用于AES加、解密
+
+```pip install nonebot```
+
+nonebot模块
