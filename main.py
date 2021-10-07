@@ -7,21 +7,32 @@ import AES
 import MD5
 import json
 import PackHelper as PHelper
-import nonebot
+#import nonebot
 import config
 
-password = "password"
+password = "pwd"
+url = "ws://127.0.0.1:8080"
+
+file_object = open('./data/config.json') 
+try:
+    file_context = file_object.read()
+    cfg = json.loads(file_context)
+    password = cfg['password']
+    url = cfg['ws']
+finally:
+    file_object.close()
+
 
 k = MD5.Encrypt(password)[0:16]
 vi = MD5.Encrypt(password)[16:32]
 runcmdid = {}
 
-bot = nonebot.get_bot()
+#bot = nonebot.get_bot()
 
 async def bot_online():
     await bot.send_private_msg(user_id=12345678, message='你好～')
 
-bot_online()
+#bot_online()
 print(f"您的AES密匙为：{k},偏移量为：{vi}")
 
 def AESEncrypt(k,iv,pack):
@@ -48,7 +59,7 @@ async def send_msg(websocket):
 # 客户端主逻辑
 async def main_XBridge():
     try:
-        async with websockets.connect('ws://127.0.0.1:8080') as websocket:
+        async with websockets.connect(url) as websocket:
             #websocket.enableTrace(True)
             await send_msg(websocket)
     except Exception as e:
@@ -58,8 +69,3 @@ async def main_XBridge():
         pass
    
 asyncio.get_event_loop().run_until_complete(main_XBridge())
-
-if __name__ == '__main__':
-    nonebot.init(config)
-    nonebot.load_builtin_plugins()
-    nonebot.run()
