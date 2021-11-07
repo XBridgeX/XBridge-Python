@@ -1,12 +1,10 @@
 import asyncio
-import os
-import sys
 import websockets
 import Utils.AES as AES
 import Utils.MD5 as MD5
 import json
 import Utils.PackHelper as PHelper
-import _thread
+from loguru import logger
 
 password = "pwd"
 url = "ws://127.0.0.1:8080"
@@ -26,7 +24,7 @@ k = MD5.Encrypt(password)[0:16]
 vi = MD5.Encrypt(password)[16:32]
 runcmdid = {}
 
-print(f"您的AES密匙为：{k},偏移量为：{vi}")
+logger.info(f"您的AES密匙为：{k},偏移量为：{vi}")
 
 def AESEncrypt(k,iv,pack):
     p = {}
@@ -42,29 +40,36 @@ async def send_msg(websocket):
     while True:      
         recv_text = await websocket.recv()
         rece = json.loads(f"{recv_text}")["params"]["raw"]
-        print(f'[RECE] {AES.AES_Decrypt(k,vi,rece)}')
+        logger.info(AES.AES_Decrypt(k,vi,rece))
         raw = json.loads(AES.AES_Decrypt(k,vi,rece))
-        print(raw['cause'])
+        logger.info(raw['cause'])
 
 
 # 客户端主逻辑
 async def main_XBridge():
+    global ws
     while(True):
         try:
             async with websockets.connect(url) as websocket:
                 ws = websocket
                 await send_msg(websocket)
         except Exception as e:
-            print(f'[ERROR] {e}')
-            print(f'[ERROR] websocket连接出错')
+            logger.warning(e)
+            logger.warning('websocket连接失败，五秒后重新连接')
+            await asyncio.sleep(5)
    
 
 async def func2():
+    global ws
     # 您可以在这个线程处理别的数据，例如QQ机器人
     while(True):
-        print(3)
+        try:
+            await ws.send(AESEncrypt(k,vi,PHelper.GetRuncmdPack('list','114514')))
+        except Exception as e:
+            logger.info(e)
+        logger.debug(3)
         await asyncio.sleep(2)
-        print(4)
+        logger.debug(4)
 
 
 tasks = [

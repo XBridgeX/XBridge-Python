@@ -19,6 +19,6 @@ pip install pycryptodome
 用于AES加、解密
 
 ```
-pip install nonebot
+pip install loguru
 ```
-nonebot模块
+日志模块
