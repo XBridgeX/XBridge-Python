@@ -1,17 +1,16 @@
 import asyncio
 import os
 import sys
-sys.path.append(f"{os.getcwd()}/Utils/")
 import websockets
-import AES
-import MD5
+import Utils.AES as AES
+import Utils.MD5 as MD5
 import json
-import PackHelper as PHelper
-#import nonebot
-import config
+import Utils.PackHelper as PHelper
+import _thread
 
 password = "pwd"
 url = "ws://127.0.0.1:8080"
+ws = None
 
 file_object = open('./data/config.json') 
 try:
@@ -27,12 +26,6 @@ k = MD5.Encrypt(password)[0:16]
 vi = MD5.Encrypt(password)[16:32]
 runcmdid = {}
 
-#bot = nonebot.get_bot()
-
-async def bot_online():
-    await bot.send_private_msg(user_id=12345678, message='你好～')
-
-#bot_online()
 print(f"您的AES密匙为：{k},偏移量为：{vi}")
 
 def AESEncrypt(k,iv,pack):
@@ -46,9 +39,7 @@ def AESEncrypt(k,iv,pack):
 
 async def send_msg(websocket):
     await websocket.send(AESEncrypt(k,vi,PHelper.GetRuncmdPack('list','114514')))
-    while True:
-        #await websocket.close(reason="user exit")  
-        #await websocket.send('smoething')
+    while True:      
         recv_text = await websocket.recv()
         rece = json.loads(f"{recv_text}")["params"]["raw"]
         print(f'[RECE] {AES.AES_Decrypt(k,vi,rece)}')
@@ -58,14 +49,28 @@ async def send_msg(websocket):
 
 # 客户端主逻辑
 async def main_XBridge():
-    try:
-        async with websockets.connect(url) as websocket:
-            #websocket.enableTrace(True)
-            await send_msg(websocket)
-    except Exception as e:
-        print(f'[ERROR] {e}')
-        print(f'[ERROR] websocket连接出错，程序即将退出')
-    finally:
-        pass
+    while(True):
+        try:
+            async with websockets.connect(url) as websocket:
+                ws = websocket
+                await send_msg(websocket)
+        except Exception as e:
+            print(f'[ERROR] {e}')
+            print(f'[ERROR] websocket连接出错')
    
-asyncio.get_event_loop().run_until_complete(main_XBridge())
+
+async def func2():
+    # 您可以在这个线程处理别的数据，例如QQ机器人
+    while(True):
+        print(3)
+        await asyncio.sleep(2)
+        print(4)
+
+
+tasks = [
+    asyncio.ensure_future(main_XBridge()),
+    asyncio.ensure_future(func2())
+]
+
+
+asyncio.get_event_loop().run_until_complete(asyncio.wait(tasks))
