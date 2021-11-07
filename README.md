@@ -22,3 +22,8 @@ pip install pycryptodome
 pip install loguru
 ```
 日志模块
+
+```
+pip install nonebot
+```
+nonebot框架

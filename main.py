@@ -5,6 +5,7 @@ import Utils.MD5 as MD5
 import json
 import Utils.PackHelper as PHelper
 from loguru import logger
+import nonebot
 
 password = "pwd"
 url = "ws://127.0.0.1:8080"
@@ -59,23 +60,27 @@ async def main_XBridge():
             await asyncio.sleep(5)
    
 
-async def func2():
+def cqhttp():
     global ws
     # 您可以在这个线程处理别的数据，例如QQ机器人
-    while(True):
+    '''while(True):
         try:
             await ws.send(AESEncrypt(k,vi,PHelper.GetRuncmdPack('list','114514')))
         except Exception as e:
             logger.info(e)
         logger.debug(3)
         await asyncio.sleep(2)
-        logger.debug(4)
+        logger.debug(4)'''
+    nonebot.init()
+    nonebot.load_builtin_plugins()
+    nonebot.run(host='127.0.0.1', port=8088)
+
 
 
 tasks = [
     asyncio.ensure_future(main_XBridge()),
-    asyncio.ensure_future(func2())
+    asyncio.ensure_future(cqhttp())
 ]
 
-
 asyncio.get_event_loop().run_until_complete(asyncio.wait(tasks))
+
